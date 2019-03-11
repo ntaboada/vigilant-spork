@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from 'react-router-dom';
 
 
-const Menu = () =>  (
+const NavBar = () =>  (
       <div>
           <nav className="navbar navbar-expand-lg navbar-light bg-light">
             <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -28,4 +28,4 @@ const Menu = () =>  (
       </div>
     );
 
-export default Menu;
+export default NavBar;

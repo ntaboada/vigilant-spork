@@ -5,7 +5,7 @@ import "./App.css";
 import Home from "../Home/index";
 import CreateTastingSession from "../TastingSession";
 import WineTasterForm from "../WineTasterForm/index";
-import Menu from "../Menu";
+import NavBar from "../NavBar";
 import resolvers from "../../graphql/resolvers";
 import initialState from "../../graphql/initialState";
 import WineListContainer from "../../containers/WineListContainer";
@@ -25,7 +25,7 @@ class App extends Component {
     <Router>
       <ApolloProvider client={client}>
         <div className="App">
-          <Menu />
+          <NavBar />
           <Route exact path="/" component={Home} />
           <Route path="/wines" component={WineListContainer} />
           <Route path="/tastingSession" component={CreateTastingSession} />  
