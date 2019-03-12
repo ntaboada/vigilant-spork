@@ -1,6 +1,6 @@
 # Frontend Engineering Coding Challenge
 
-Welcome to Carpe Vinum -  the open source tool for wine lovers to connect, track their tasting sessions, and discover new wine. This tool is used to test potential candidates for our engineering team.
+Welcome to Viligant Spork -  the open source tool for wine lovers to connect, track their tasting sessions, and discover new wine. This tool is used to test potential candidates for our engineering team.
 
 ## Back End Challenge
 
