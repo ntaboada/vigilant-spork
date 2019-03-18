@@ -4,7 +4,7 @@ var Tesseract = require('tesseract.js')
 const { createApolloFetch } = require('apollo-fetch');
 
 const fetch = createApolloFetch({
-  uri: 'http://192.168.0.19:4466',
+  uri: 'http://10.14.10.94:4466',
 });
 
 const storage = multer.diskStorage({

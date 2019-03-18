@@ -12,7 +12,7 @@ import WineListContainer from "../../containers/WineListContainer";
 import { BrowserRouter as Router, Route } from "react-router-dom";
 
 const client = new ApolloClient({
-  uri: "http://192.168.0.19:4466",
+  uri: "http://10.14.10.94:4466",
   clientState: {
     defaults: initialState,
     resolvers,

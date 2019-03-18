@@ -26,7 +26,6 @@ class CreateReview extends Component {
     return (
       <div>
         <div>
-          <h5>{this.props.wine}</h5>
           <input class="form-control"
             name="score"
             value={score}

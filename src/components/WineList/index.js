@@ -14,11 +14,6 @@ const Toast = Swal.mixin({
   });
 
 class ListWines extends Component {
-  
-  componentDidMount() {
-    const { client } = this.props;
-    client.query({ query: WINES });
-  }
   deleteWine = (id) => {
     const { client } = this.props;
     Swal.fire({
@@ -31,12 +26,14 @@ class ListWines extends Component {
             confirmButtonText: 'Yes, delete it!'
     }).then((result) => {
             if (result.value) {
-
                 client.mutate({
                     variables: {
                         id: id
                     },
-                    mutation: DELETE_WINE,                    
+                    mutation: DELETE_WINE,
+                    refetchQueries: [{
+                      query: WINES,
+                    }]              
                   })
                   .then(result => { 
                     Toast.fire(
@@ -51,8 +48,6 @@ class ListWines extends Component {
                     title:"Wine Updated Correctly",
                     text:error
                 }) });
-
-              
             }
           })
     }
@@ -62,6 +57,9 @@ class ListWines extends Component {
       client.mutate({
             mutation: UPDATE_WINE,
             variables: submitObject,
+            refetchQueries: [{
+              query: WINES,
+            }]
           })
           .then(result => { 
               Toast.fire({
@@ -91,39 +89,39 @@ class ListWines extends Component {
   };
 
   render() {    
-    const { wines, loading, error } = this.props;
+    const { wines } = this.props;
     return (
       <React.Fragment>
       {
-        loading ? 
-        <div> Loading </div> :
-        <React.Fragment>
+        !wines ? 
+          <div> Loading </div> :
+          <React.Fragment>
           <div className="container">
-            <CreateWine 
-              {...this.props}
-            />
-          </div>
-          <div className="d-inline-flex p-2 bd-highlight">
-          {
-              wines.map((wine, i) => (
-                <div key={`wine${i}`} value={wine.id} className="card" style={{width: "18rem", margin:"10px"}}>
-                    <img src={wine.image?wine.image:"assets/img/tastesession.png"} class="card-img-top" alt="..." />
-                    <div class="card-body">
-                        <h5 class="card-title">Wine</h5>
-                        <WineFormContainer
-                          wine={wine}
-                          onSubmit={this.handleUpdate}
-                        />
-                        <button
-                          className="btn btn-outline-danger" 
-                          onClick={() => this.deleteWine(wine.id)}>Delete
-                        </button>
-                    </div>
-                </div>
-              ))
-            }
-          </div>
-        </React.Fragment>
+           <CreateWine 
+             {...this.props}
+           />
+         </div>
+         <div className="d-inline-flex p-2 bd-highlight">
+         {
+             wines.map((wine, i) => (
+               <div key={`wine${i}`} value={wine.id} className="card" style={{width: "18rem", margin:"10px"}}>
+                   <img src={wine.image? wine.image: "assets/img/wine-example.jpeg" } class="card-img-top" alt="..." />
+                   <div class="card-body">
+                       <h5 class="card-title">Wine</h5>
+                       <WineFormContainer
+                         wine={wine}
+                         onSubmit={this.handleUpdate}
+                       />
+                       <button
+                         className="btn btn-outline-danger" 
+                         onClick={() => this.deleteWine(wine.id)}>Delete
+                       </button>
+                   </div>
+               </div>
+             ))
+           }
+         </div>
+       </React.Fragment>
       }
       </React.Fragment>
     );

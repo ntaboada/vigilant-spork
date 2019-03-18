@@ -14,14 +14,15 @@ const Toast = Swal.mixin({
   });
 
 class CreateWine extends Component {
+  
   state = {
     isOpen: false,
     name: "",
     grapes: [],
     winery: "",
-    year: undefined,
-    alcohol: undefined,
-    price: undefined,
+    year: null,
+    alcohol: null,
+    price: null,
   };
 
   toggle = () => {
@@ -41,26 +42,44 @@ class CreateWine extends Component {
     }
   };
 
+  onCompleted = () => {
+    Toast.fire({
+      type:"success",
+      title:"Wine Added Successfully"
+    });
+    this.setState({
+      name: "",
+      grapes: [],
+      winery: "",
+      year: undefined,
+      alcohol: undefined,
+      price: undefined,
+    });
+    this.button.click();
+  }
+
   render() {
-    const { isOpen, name, grapes, winery, year, alcohol, price } = this.state;
+    const { name, grapes, winery, year, alcohol, price, isOpen } = this.state;
     return (
       <div style={{marginTop:"10px"}}>
-        <button class="btn btn-outline-primary " onClick={this.toggle} data-toggle="modal" data-target="#exampleModal">Create New Wine</button>
-        <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <button class="btn btn-outline-primary "
+                onClick={this.toggle}
+                data-toggle="modal"
+                data-target="#exampleModal"
+        >Create New Wine</button>
+        <div class={"modal fade"} id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
           <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title" id="exampleModalLabel">New Wine</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <button ref={el => this.button = el} type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
             <div class="modal-body">
-              
-              <div 
-          >
+              <div>
             <input
-            class="form-control"
+              class="form-control"
               name="name"
               value={name}
               onChange={this.inputHandler}
@@ -69,7 +88,7 @@ class CreateWine extends Component {
             />
             <br />
             <select
-            class="form-control"
+              class="form-control"
               name="grapes"
               value={grapes}
               onChange={this.inputHandler}
@@ -87,7 +106,7 @@ class CreateWine extends Component {
             </select>
             <br />
             <input
-            class="form-control"
+              class="form-control"
               name="winery"
               value={winery}
               onChange={this.inputHandler}
@@ -96,7 +115,7 @@ class CreateWine extends Component {
             />
             <br />
             <input
-            class="form-control"
+              class="form-control"
               name="year"
               value={year}
               onChange={this.inputHandler}
@@ -105,7 +124,7 @@ class CreateWine extends Component {
             />
             <br />
             <input
-            class="form-control"
+              class="form-control"
               name="alcohol"
               value={alcohol}
               onChange={this.inputHandler}
@@ -114,28 +133,22 @@ class CreateWine extends Component {
             />
             <br />
             <input
-            class="form-control"
+              class="form-control"
               name="price"
               value={price}
               onChange={this.inputHandler}
               type="number"
               placeholder="Price"
             />
-            
           </div>
-              
-            </div>
+        </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
               <Mutation
               mutation={CREATE_WINE}
-              update={(cache, { data: { createWine } }) => {
-                const { wines } = cache.readQuery({ query: WINES });
-                cache.writeQuery({
-                  query: WINES,
-                  data: { wines: wines.concat([createWine]) },
-                });
-              }}
+              refetchQueries={[{
+                query: WINES,
+              }]}
               variables={{
                 name,
                 grapes,
@@ -144,26 +157,10 @@ class CreateWine extends Component {
                 alcohol,
                 price,
               }}
-              onCompleted={() =>{
-                Toast.fire({
-                  type:"success",
-                  title:"Wine Added Successfully"
-                })
-                this.setState({
-                  isOpen: false,
-                  name: "",
-                  grapes: [],
-                  winery: "",
-                  year: undefined,
-                  alcohol: undefined,
-                  price: undefined,
-                })
-              }
-              }
+              onCompleted={this.onCompleted}
             >
               {postMutation => <button class="btn btn-primary" onClick={postMutation}>Save changes</button>}
             </Mutation>
-              
             </div>
           </div>
         </div>

@@ -1,119 +1,177 @@
 import React, { Component } from "react";
-import { Mutation } from "react-apollo";
-
-import ListWines from "../ListWines";
-
-import WINE_TASTERS from "../../graphql/queries/WINE_TASTERS";
+import { Mutation, withApollo } from "react-apollo";
+import WINES from "../../graphql/queries/WINES";
 import CREATE_WINE_TASTER from "../../graphql/mutations/CREATE_WINE_TASTER";
+import OptionsListWines from "../OptionsListWines";
+
+import Swal from "sweetalert2";
+
+const Toast = Swal.mixin({
+    toast: true,
+    position: 'center',
+    showConfirmButton: false,
+    timer: 3000
+  });
 
 class CreateWineTaster extends Component {
   state = {
     isOpen: false,
-    name: "",
-    nationality: "",
+    name: '',
+    nationality: '',
     gender: "MALE",
     age: undefined,
-    favouriteWine: undefined,
+    favouriteWine: '',
+    existingWines: false,
   };
 
+  async componentDidMount() {
+    const { client } = this.props;
+    const res = await client.query({
+      query: WINES
+    });
+    this.setState({ existingWines: res.data.wines.length > 0 })
+  }
   toggle = () => {
     this.setState({ isOpen: !this.state.isOpen });
   };
 
   inputHandler = e => {
     let { name, value } = e.target;
-    if (name === "number") value = Number(value);
+    if (name === "age") value = Number(value);
     this.setState({ [name]: value });
   };
 
+  onCompleted = () => {
+    Toast.fire({
+      type:"success",
+      title:"Wine Added Successfully"
+    });
+    this.setState({
+      name: "",
+      nationality: "",
+      gender: "MALE",
+      age: undefined,
+      favouriteWine: "",
+    });
+    this.button.click();
+  }
+
   render() {
     const {
-      isOpen,
-      name,
-      nationality,
-      gender,
-      age,
-      favouriteWine,
-    } = this.state;
+        name,
+        nationality,
+        gender,
+        age,
+        favouriteWine,
+        existingWines,
+      } = this.state;
     return (
       <div style={{marginTop:"10px"}}>
-        <button class="btn btn-outline-primary outline" onClick={this.toggle}>Create New Wine Taster</button>
-        {isOpen ? (
-          <div
-            style={{
-              border: "1px solid black",
-              padding: "20px",
-              margin: "0 10%",
-              borderRadius: "2%",
-            }}
-          >
-            <input
-              name="name"
-              value={name}
-              onChange={this.inputHandler}
-              placeholder="Name"
-            />
-            <input
-              name="nationality"
-              value={nationality}
-              onChange={this.inputHandler}
-              placeholder="Nationality"
-            />
-            <select
-              name="gender"
-              value={this.state.gender}
-              onChange={e => this.setState({ gender: e.target.value })}
+       { existingWines ? 
+          (<div>
+          <button class="btn btn-outline-primary"
+                  onClick={this.toggle}
+                  data-toggle="modal"
+                  data-target="#exampleModal">
+                  Create New Wine Taster
+          </button>
+          <div class="modal fade"
+              id="exampleModal"
+              tabindex="-1"
+              role="dialog"
+              aria-labelledby="exampleModalLabel"
+              aria-hidden="true"
             >
-              <option value="MALE">Male</option>
-              <option value="FEMALE">Female</option>
-            </select>
-            <input
-              name="age"
-              value={age}
-              onChange={e => this.setState({ age: Number(e.target.value) })}
-              type="number"
-              placeholder="Age"
-            />
-            <ListWines
-              childCB={id => this.setState({ favouriteWine: id })}
-              placeholder="Favourite Wine"
-            />
-            <Mutation
-              mutation={CREATE_WINE_TASTER}
-              update={(cache, { data: { createWineTaster } }) => {
-                const { wineTasters } = cache.readQuery({
-                  query: WINE_TASTERS,
-                });
-                cache.writeQuery({
-                  query: WINE_TASTERS,
-                  data: { wineTasters: wineTasters.concat([createWineTaster]) },
-                });
-              }}
-              variables={{
-                name,
-                nationality,
-                gender,
-                age,
-                favouriteWine,
-              }}
-              onCompleted={() =>
-                this.setState({
-                  isOpen: false,
-                  name: "",
-                  nationality: "",
-                  gender: "MALE",
-                  age: undefined,
-                  favouriteWine: undefined,
-                })
-              }
-            >
-              {postMutation => <button onClick={postMutation}>Submit</button>}
-            </Mutation>
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Create New Wine Taster</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+              <div>
+              <input
+                class="form-control"
+                name="name"
+                value={name}
+                onChange={this.inputHandler}
+                type="text"
+                placeholder="Name"
+              />
+              <br />
+              <input
+              class="form-control"
+                name="nationality"
+                value={nationality}
+                onChange={this.inputHandler}
+                type="text"
+                placeholder="Nationality"
+              />
+              <br />
+              <select
+              class="form-control"
+                name="gender"
+                value={gender}
+                onChange={this.inputHandler}
+                type="text"
+                placeholder="Gender"
+              >
+                <option value="MALE">Male</option>
+                <option value="FEMALE">Female</option>
+              </select>
+              <br />
+              <input
+                class="form-control"
+                name="age"
+                value={age}
+                onChange={this.inputHandler}
+                type="number"
+                placeholder="Age"
+              />
+              <br />
+              <OptionsListWines
+                childCB={id => this.setState({ favouriteWine: id })}
+                placeholder="Favourite Wine"
+              />
+              <br />
+            </div>
+              </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" ref={el => this.button = el} data-dismiss="modal">Close</button>
+                  <Mutation
+                  mutation={CREATE_WINE_TASTER}
+                  variables={{
+                    name,
+                    nationality,
+                    gender,
+                    age,
+                    favouriteWine,
+                  }}
+                  onCompleted={this.onCompleted}
+                >
+                  {postMutation => <button class="btn btn-primary" onClick={postMutation}>Save changes</button>}
+                </Mutation>
+                </div>
+            </div>
+            </div>
           </div>
-        ) : null}
+          </div>
+          )
+          : (
+            <div style={{ 
+              color: 'black',
+              backgroundColor: 'bisque',
+              fontSize: '1.5em',
+            }}>
+              Make sure to create a wine first
+            </div>
+          )
+        }
       </div>
     );
   }
 }
 
-export default CreateWineTaster;
+export default withApollo(CreateWineTaster);

@@ -1,7 +1,7 @@
 import React from "react";
 import { graphql, compose, Query, Mutation } from "react-apollo";
 
-import ListWines from "../ListWines/index";
+import OptionsListWines from "../OptionsListWines/index";
 import ListWineTasters from "../ListWineTaster/index";
 import CreateReview from "../CreateReview";
 
@@ -73,7 +73,7 @@ const CreateTastingSession = props => {
                   </h5>
                   <p class="card-text">
                   <h5>Choose Wine(s)</h5>
-                      <ListWines
+                      <OptionsListWines
                         cb={wine => {
                           if (!wine.includes(wine)) {
                             this.setState({
@@ -135,12 +135,7 @@ const CreateTastingSession = props => {
               </div>
             </div>
           </div>
-
-              
               <p className="card-text">
-                
-            
-            
             <Mutation
               mutation={UPDATE_TASTING_SESSION}
               variables={{ sessionWineIDs, sessionWineTastersIDs, sessionID }}
